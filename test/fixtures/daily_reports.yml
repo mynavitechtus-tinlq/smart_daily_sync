@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user_id: MyString
+  content: MyText
+  reported_at: 2025-11-06 19:09:48
+  auto_sent: false
+  default: 
+
+two:
+  user_id: MyString
+  content: MyText
+  reported_at: 2025-11-06 19:09:48
+  auto_sent: false
+  default: 

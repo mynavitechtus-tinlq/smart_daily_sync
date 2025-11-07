@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  slack_user_id: MyString
+  slack_user_name: MyString
+  backlog_user_id: 1
+  backlog_user_name: MyString
+  backlog_user_email: MyString
+
+two:
+  slack_user_id: MyString
+  slack_user_name: MyString
+  backlog_user_id: 1
+  backlog_user_name: MyString
+  backlog_user_email: MyString
