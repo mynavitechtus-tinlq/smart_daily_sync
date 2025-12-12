@@ -4,13 +4,12 @@ class Api::SlackController < ApplicationController
   # Slack slash command: /daily
   def commands
      Rails.logger.info "[Slack] Params: #{params.inspect}"
+     errors = []
     
     if params[:command] == '/daily'
       slack_user_id = params[:user_id]
       slack_channel_id = params[:channel_id]
       trigger_id = params[:trigger_id]
-      errors = []
-
       slack_user = SlackUser.find_by(slack_user_id: slack_user_id)
       errors << "Slack user #{params[:user_name]} not found" if slack_user.blank?
       slack_channel = SlackChannel.find_by(slack_channel_id: slack_channel_id)
@@ -21,6 +20,39 @@ class Api::SlackController < ApplicationController
       report = ReportService.generate_for_user(slack_user, slack_channel)
       data = SlackService.open_modal(trigger_id:, slack_channel_id:, report:)
 
+      render json: { ok: true }
+    elsif params[:command] == '/sprint-report'
+      slack_channel_id = params[:channel_id]
+      slack_channel = SlackChannel.find_by(slack_channel_id: slack_channel_id)
+      errors << "Slack channel #{params[:channel_name]} not found" if slack_channel.blank?
+
+      return render json: { errors: errors.join(", ") }, status: :not_found if errors.present?
+
+      report = ReportService.generate_sprint_report(slack_channel)
+      render json: { ok: true }
+    elsif params[:command] == '/communication-report'
+      slack_channel_id = params[:channel_id]
+      slack_channel = SlackChannel.find_by(slack_channel_id: slack_channel_id)
+      errors << "Slack channel #{params[:channel_name]} not found" if slack_channel.blank?
+
+      return render json: { errors: errors.join(", ") }, status: :not_found if errors.present?
+
+      report = ReportService.generate_communication_report(slack_channel)
+      render json: { ok: true }
+    elsif params[:command] == '/help'
+      slack_channel_id = params[:channel_id]
+      slack_channel = SlackChannel.find_by(slack_channel_id: slack_channel_id)
+      errors << "Slack channel #{params[:channel_name]} not found" if slack_channel.blank?
+
+      return render json: { errors: errors.join(", ") }, status: :not_found if errors.present?
+      help_text = <<~TEXT
+        Available commands:
+        /daily - Open daily report modal
+        /sprint-report - Generate sprint report for the channel
+        /communication-report - Generate communication report for the channel
+        /help - Show this help message
+      TEXT
+      SlackService.send_message(slack_channel.slack_channel_id, help_text)
       render json: { ok: true }
     else
       render json: { text: "Unknown command" }
